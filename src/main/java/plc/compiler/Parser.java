@@ -63,22 +63,8 @@ public final class Parser {
             // while-statement
             return parseIfStatement();
         }
-        //get rid of regex stuff
-        //more to this that im missing
-        else if(match("_") || peek("[A-Z]") || peek("[a-z]")){
-            // assignment-statement
-            return parseAssignmentStatement();
-        }
-        else if(match("==") || match("!=")){
-            // expression-statement
-            return parseExpressionStatement();
-        }
-        //not gonna help
-        else if(!match("LET") && !match("IF") && !match("WHILE")){
-            return parseStatement();
-        }
         else{
-            throw new UnsupportedOperationException();
+            return parseExpression();
         }
     }
 
@@ -180,7 +166,13 @@ public final class Parser {
      * Parses the {@code equality-expression} rule.
      */
     public Ast.Expression parseEqualityExpression() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        parseAdditiveExpression();
+        while(match("==") || match("!=")) {
+            parseAdditiveExpression();
+        }
+
+        return new Ast.Expression();
+
     }
 
     /**
