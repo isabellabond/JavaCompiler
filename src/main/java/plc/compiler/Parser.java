@@ -63,7 +63,7 @@ public final class Parser {
             // while-statement
             return parseIfStatement();
         }
-        else if(match("[_]") || match("[A-Z]") || match("[a-z]")){
+        else if(match("_") || peek("[A-Z]") || peek("[a-z]")){
             // assignment-statement
             return parseAssignmentStatement();
         }
@@ -85,7 +85,7 @@ public final class Parser {
      * javadocs of {@link #parseStatement()}.
      */
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -93,6 +93,17 @@ public final class Parser {
      * called if the next tokens start a declaration statement, aka {@code let}.
      */
     public Ast.Statement.Declaration parseDeclarationStatement() throws ParseException {
+        if(match("LET")){
+            String name = tokens.get(0).getLiteral();
+            String type = tokens.get(0).getType().name();
+            tokens.advance();
+
+            while (!match(";")) {
+                if (!tokens.has(0)) throw new ParseException("No ;", tokens.index);
+                //Optional<Ast.Expression> args = parseExpression();
+            }
+            //return new Ast.Statement.Declaration(name, type, args);
+        }
         throw new UnsupportedOperationException(); //TODO
     }
 
