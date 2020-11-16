@@ -63,6 +63,8 @@ public final class Parser {
             // while-statement
             return parseIfStatement();
         }
+        //get rid of regex stuff
+        //more to this that im missing
         else if(match("_") || peek("[A-Z]") || peek("[a-z]")){
             // assignment-statement
             return parseAssignmentStatement();
@@ -71,6 +73,7 @@ public final class Parser {
             // expression-statement
             return parseExpressionStatement();
         }
+        //not gonna help
         else if(!match("LET") && !match("IF") && !match("WHILE")){
             return parseStatement();
         }
@@ -121,7 +124,29 @@ public final class Parser {
      * if the next tokens start an if statement, aka {@code if}.
      */
     public Ast.Statement.If parseIfStatement() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        match("IF");
+        Ast.Expression condition = parseExpression();
+        List<Ast.Statement> thenStatements = new ArrayList<>();
+        List<Ast.Statement> elseStatements = new ArrayList<>();
+        if (!match("THEN")) {
+            throw new ParseException("No THEN", tokens.index);
+        }
+        /*
+        IF true THEN
+            ...
+        END
+            ...
+        END
+         */
+        while (!match("END")) {
+            thenStatements.add(parseStatement());
+            if(match("ELSE")){
+                while (!match("END")) {
+                    elseStatements.add(parseStatement());
+                }
+            }
+        }
+        return new Ast.Statement.If(condition, thenStatements, elseStatements);
     }
 
     /**
@@ -129,13 +154,27 @@ public final class Parser {
      * called if the next tokens start a while statement, aka {@code while}.
      */
     public Ast.Statement.While parseWhileStatement() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        match("WHILE");
+        Ast.Expression condition = parseExpression();
+        List<Ast.Statement> statements = new ArrayList<>();
+
+        if (!match("DO")) {
+            throw new ParseException("No DO", tokens.index);
+        }
+
+        while (!match("END")) {
+            statements.add(parseStatement());
+        }
+
+        return new Ast.Statement.While(condition, statements);
     }
 
     /**
      * Parses the {@code expression} rule.
      */
     public Ast.Expression parseExpression() throws ParseException {
+
+
         throw new UnsupportedOperationException(); //TODO
     }
 
