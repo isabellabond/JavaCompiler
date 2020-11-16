@@ -88,7 +88,11 @@ public final class Parser {
      * javadocs of {@link #parseStatement()}.
      */
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
-        throw new UnsupportedOperationException();
+        Ast.Expression value = new Ast.Expression();
+        while (!match(";")) {
+            value = parseEqualityExpression();
+        }
+        return new Ast.Statement.Expression(value);
     }
 
     /**
@@ -96,17 +100,12 @@ public final class Parser {
      * called if the next tokens start a declaration statement, aka {@code let}.
      */
     public Ast.Statement.Declaration parseDeclarationStatement() throws ParseException {
-        if(match("LET")){
-            String name = tokens.get(0).getLiteral();
-            String type = tokens.get(0).getType().name();
-            tokens.advance();
+        match("LET");
 
-            while (!match(";")) {
-                if (!tokens.has(0)) throw new ParseException("No ;", tokens.index);
-                //Optional<Ast.Expression> args = parseExpression();
-            }
-            //return new Ast.Statement.Declaration(name, type, args);
-        }
+        //not sure
+        String name = tokens.get(0).getLiteral();
+
+
         throw new UnsupportedOperationException(); //TODO
     }
 
@@ -165,7 +164,6 @@ public final class Parser {
         while (!match("END")) {
             statements.add(parseStatement());
         }
-
         return new Ast.Statement.While(condition, statements);
     }
 
