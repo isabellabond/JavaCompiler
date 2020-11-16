@@ -35,8 +35,13 @@ public final class Parser {
     /**
      * Parses the {@code source} rule.
      */
+
     public Ast.Source parseSource() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        List<Ast.Statement> statements = new ArrayList<Ast.Statement>();
+        while(tokens.has(0)){
+            statements.add(parseStatement());
+        }
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -46,7 +51,32 @@ public final class Parser {
      * clarification on what starts each type of statement.
      */
     public Ast.Statement parseStatement() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        if(match("LET")) {
+            // declaration-statement
+            return parseDeclarationStatement();
+        }
+        else if(match("IF")){
+            // if-statement
+            return parseIfStatement();
+        }
+        else if(match("WHILE")){
+            // while-statement
+            return parseIfStatement();
+        }
+        else if(match("[_]") || match("[A-Z]") || match("[a-z]")){
+            // assignment-statement
+            return parseAssignmentStatement();
+        }
+        else if(match("==") || match("!=")){
+            // expression-statement
+            return parseExpressionStatement();
+        }
+        else if(!match("LET") && !match("IF") && !match("WHILE")){
+            return parseStatement();
+        }
+        else{
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
