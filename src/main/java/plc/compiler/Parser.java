@@ -55,6 +55,9 @@ public final class Parser {
             // declaration-statement
             return parseDeclarationStatement();
         }
+        else if(match(tokens.get(0).getType() == Token.Type.IDENTIFIER)){
+            parseDeclarationStatement();
+        }
         else if(match("IF")){
             // if-statement
             return parseIfStatement();
@@ -64,7 +67,7 @@ public final class Parser {
             return parseIfStatement();
         }
         else{
-            return parseExpression();
+            return parseExpressionStatement();
         }
     }
 
@@ -158,8 +161,6 @@ public final class Parser {
      */
     public Ast.Expression parseExpression() throws ParseException {
 
-
-        throw new UnsupportedOperationException(); //TODO
     }
 
     /**
