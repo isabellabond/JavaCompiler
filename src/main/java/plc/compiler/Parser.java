@@ -195,35 +195,39 @@ public final class Parser {
      * Parses the {@code equality-expression} rule.
      */
     public Ast.Expression parseEqualityExpression() throws ParseException {
-        Ast.Expression result = parseAdditiveExpression();
+        Ast.Expression left = parseAdditiveExpression();
         while(match("==") || match("!=")) {
             String operator = tokens.get(-1).getLiteral();
             Ast.Expression ex = parseAdditiveExpression();
-            result = new Ast.Expression.Binary(operator, result, ex);
+            left = new Ast.Expression.Binary(operator, left, ex);
         }
-        return result;
+        return left;
     }
 
     /**
      * Parses the {@code additive-expression} rule.
      */
     public Ast.Expression parseAdditiveExpression() throws ParseException {
-        parseMultiplicativeExpression();
+        Ast.Expression left = parseMultiplicativeExpression();
         while(match("+") || match("-")) {
-            parseMultiplicativeExpression();
+            String operator = tokens.get(-1).getLiteral();
+            Ast.Expression right = parseMultiplicativeExpression();
+            left = new Ast.Expression.Binary(operator, left, right);
         }
-        return new Ast.Expression();
+        return left;
     }
 
     /**
      * Parses the {@code multiplicative-expression} rule.
      */
     public Ast.Expression parseMultiplicativeExpression() throws ParseException {
-        parsePrimaryExpression();
+        Ast.Expression left = parsePrimaryExpression();
         while(match("*") || match("/")) {
-            parsePrimaryExpression();
+            String operator = tokens.get(-1).getLiteral();
+            Ast.Expression right = parsePrimaryExpression();
+            left = new Ast.Expression.Binary(operator, left, right);
         }
-        return new Ast.Expression();
+        return left;
     }
 
     /**
