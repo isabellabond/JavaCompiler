@@ -125,7 +125,11 @@ public final class Parser {
 
     //assignment-statement ::= identifier = expression ;
     public Ast.Statement.Assignment parseAssignmentStatement() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        String name = tokens.get(0).getLiteral();
+        match("=");
+        Ast.Expression ex = parseExpression();
+
+        return new Ast.Statement.Assignment(name, ex);
     }
 
     /**
