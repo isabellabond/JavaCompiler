@@ -69,6 +69,7 @@ public final class Parser {
         else{
             return parseExpressionStatement();
         }
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -78,6 +79,9 @@ public final class Parser {
      */
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
         Ast.Expression value = new Ast.Expression();
+        if(value.equals(null)){
+            throw new ParseException("Empty", tokens.index);
+        }
         while (!match(";")) {
             value = parseEqualityExpression();
         }
@@ -88,14 +92,28 @@ public final class Parser {
      * Parses the {@code declaration-statement} rule. This method should only be
      * called if the next tokens start a declaration statement, aka {@code let}.
      */
+
+    // declaration-statement ::= LET identifier : identifier ( = expression)? ;
     public Ast.Statement.Declaration parseDeclarationStatement() throws ParseException {
         match("LET");
 
         //not sure
         String name = tokens.get(0).getLiteral();
 
+        match(":");
 
-        throw new UnsupportedOperationException(); //TODO
+        String type = tokens.get(0).getLiteral();
+
+        Optional<Ast.Expression> value = null;
+
+        while(!match(";")){
+            if(match("=")){
+                value = Optional.of(parseExpression());
+            }
+        }
+
+        return new Ast.Statement.Declaration(name, type, value);
+
     }
 
     /**
@@ -160,7 +178,8 @@ public final class Parser {
      * Parses the {@code expression} rule.
      */
     public Ast.Expression parseExpression() throws ParseException {
-
+        //TODO
+        return new Ast.Expression();
     }
 
     /**
