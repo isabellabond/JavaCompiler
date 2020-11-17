@@ -251,8 +251,8 @@ public final class Parser {
         }
 
         //not sure about this one
-        if(match(tokens.get(0).getType() == Token.Type.DECIMAL)){
-            return new Ast.Expression.Literal(tokens.get(-1).getLiteral());
+        if(peek(Token.Type.DECIMAL) | peek(Token.Type.STRING) | peek(Token.Type.INTEGER)){
+            return new Ast.Expression.Literal(tokens.get(0).getLiteral());
         }
 
 
