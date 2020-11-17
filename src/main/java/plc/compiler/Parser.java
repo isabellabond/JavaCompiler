@@ -170,23 +170,29 @@ public final class Parser {
         while(match("==") || match("!=")) {
             parseAdditiveExpression();
         }
-
         return new Ast.Expression();
-
     }
 
     /**
      * Parses the {@code additive-expression} rule.
      */
     public Ast.Expression parseAdditiveExpression() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        parseMultiplicativeExpression();
+        while(match("+") || match("-")) {
+            parseMultiplicativeExpression();
+        }
+        return new Ast.Expression();
     }
 
     /**
      * Parses the {@code multiplicative-expression} rule.
      */
     public Ast.Expression parseMultiplicativeExpression() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        parsePrimaryExpression();
+        while(match("*") || match("/")) {
+            parsePrimaryExpression();
+        }
+        return new Ast.Expression();
     }
 
     /**
