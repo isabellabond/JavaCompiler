@@ -77,6 +77,7 @@ public final class Parser {
      * the next tokens do not start another statement type, as explained in the
      * javadocs of {@link #parseStatement()}.
      */
+
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
         Ast.Expression value = new Ast.Expression();
         if(value.equals(null)){
@@ -121,6 +122,8 @@ public final class Parser {
      * called if the next tokens start an assignment statement, aka both an
      * {@code identifier} followed by {@code =}.
      */
+
+    //assignment-statement ::= identifier = expression ;
     public Ast.Statement.Assignment parseAssignmentStatement() throws ParseException {
         throw new UnsupportedOperationException(); //TODO
     }
@@ -129,6 +132,8 @@ public final class Parser {
      * Parses the {@code if-statement} rule. This method should only be called
      * if the next tokens start an if statement, aka {@code if}.
      */
+
+    //if-statement ::= IF expression THEN statement* ( ELSE statement* )? END
     public Ast.Statement.If parseIfStatement() throws ParseException {
         match("IF");
         Ast.Expression condition = parseExpression();
@@ -159,6 +164,8 @@ public final class Parser {
      * Parses the {@code while-statement} rule. This method should only be
      * called if the next tokens start a while statement, aka {@code while}.
      */
+
+    //while-statement ::= WHILE expression DO statement* END
     public Ast.Statement.While parseWhileStatement() throws ParseException {
         match("WHILE");
         Ast.Expression condition = parseExpression();
