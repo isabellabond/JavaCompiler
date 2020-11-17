@@ -99,11 +99,11 @@ public final class Parser {
         match("LET");
 
         //not sure
-        String name = tokens.get(tokens.index).getLiteral();
+        String name = tokens.get(0).getLiteral();
 
         match(":");
 
-        String type = tokens.get(tokens.index).getLiteral();
+        String type = tokens.get(0).getLiteral();
 
         Optional<Ast.Expression> value = null;
 
