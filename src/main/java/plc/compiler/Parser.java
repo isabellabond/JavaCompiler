@@ -241,14 +241,20 @@ public final class Parser {
     //    ( expression )
     //checking for token type
     public Ast.Expression parsePrimaryExpression() throws ParseException {
+
+        //these are definitely right!
         if (match("TRUE")) {
             return new Ast.Expression.Literal(Boolean.TRUE);
         }
-        else if (match("FALSE")) {
+        if (match("FALSE")) {
             return new Ast.Expression.Literal(Boolean.FALSE);
         }
 
-        throw new ParseException("idk", tokens.index);
+        //not sure about this one
+        if(match(tokens.get(0).getType() == Token.Type.DECIMAL)){
+            return new Ast.Expression.Literal(tokens.get(-1).getLiteral());
+        }
+
 
     }
 
