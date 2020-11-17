@@ -99,19 +99,18 @@ public final class Parser {
         match("LET");
 
         //not sure
-        String name = tokens.get(0).getLiteral();
+        String name = tokens.get(tokens.index).getLiteral();
 
         match(":");
 
-        String type = tokens.get(0).getLiteral();
+        String type = tokens.get(tokens.index).getLiteral();
 
         Optional<Ast.Expression> value = null;
 
-        while(!match(";")){
-            if(match("=")){
-                value = Optional.of(parseExpression());
-            }
+        if(match("=")){
+            value = Optional.of(parseExpression());
         }
+        match(";");
 
         return new Ast.Statement.Declaration(name, type, value);
 
@@ -232,6 +231,8 @@ public final class Parser {
      * functions. It may be helpful to break these up into other methods but is
      * not strictly necessary.
      */
+
+    //checking for token type
     public Ast.Expression parsePrimaryExpression() throws ParseException {
         throw new UnsupportedOperationException(); //TODO
     }
