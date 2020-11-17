@@ -188,19 +188,20 @@ public final class Parser {
      * Parses the {@code expression} rule.
      */
     public Ast.Expression parseExpression() throws ParseException {
-        //TODO
-        return new Ast.Expression();
+        return parseEqualityExpression();
     }
 
     /**
      * Parses the {@code equality-expression} rule.
      */
     public Ast.Expression parseEqualityExpression() throws ParseException {
-        parseAdditiveExpression();
+        Ast.Expression result = parseAdditiveExpression();
         while(match("==") || match("!=")) {
-            parseAdditiveExpression();
+            String operator = tokens.get(-1).getLiteral();
+            Ast.Expression ex = parseAdditiveExpression();
+            result = new Ast.Expression.Binary(operator, result, ex);
         }
-        return new Ast.Expression();
+        return result;
     }
 
     /**
@@ -232,9 +233,19 @@ public final class Parser {
      * not strictly necessary.
      */
 
+    // identifier ( ( (expression ( , expression )* )? ) )? |
+    //    ( expression )
     //checking for token type
     public Ast.Expression parsePrimaryExpression() throws ParseException {
-        throw new UnsupportedOperationException(); //TODO
+        if (match("TRUE")) {
+            return new Ast.Expression.Literal(Boolean.TRUE);
+        }
+        else if (match("FALSE")) {
+            return new Ast.Expression.Literal(Boolean.FALSE);
+        }
+
+        throw new ParseException("idk", tokens.index);
+
     }
 
     /**
