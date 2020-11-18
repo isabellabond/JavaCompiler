@@ -24,31 +24,22 @@ public final class Parser {
 
     public Ast.Statement parseStatement() throws ParseException {
         if (match("LET")) {
-            // declaration-statement
             return parseDeclarationStatement();
         }
-        else if(match(tokens.get(0).getType() == Token.Type.IDENTIFIER)){
-            parseDeclarationStatement();
+        else if(peek(Token.Type.IDENTIFIER,"=")){
+            parseAssignmentStatement();
         }
         else if(match("IF")){
-            // if-statement
             return parseIfStatement();
         }
         else if(match("WHILE")){
-            // while-statement
-            return parseIfStatement();
+            return parseWhileStatement();
         }
         else{
             return parseExpressionStatement();
         }
         throw new UnsupportedOperationException();
     }
-
-    /**
-     * Parses the {@code expression-statement} rule. This method is called if
-     * the next tokens do not start another statement type, as explained in the
-     * javadocs of {@link #parseStatement()}.
-     */
 
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
         Ast.Expression value = new Ast.Expression();
@@ -60,11 +51,6 @@ public final class Parser {
         }
         return new Ast.Statement.Expression(value);
     }
-
-    /**
-     * Parses the {@code declaration-statement} rule. This method should only be
-     * called if the next tokens start a declaration statement, aka {@code let}.
-     */
 
     // declaration-statement ::= LET identifier : identifier ( = expression)? ;
     public Ast.Statement.Declaration parseDeclarationStatement() throws ParseException {
@@ -94,61 +80,42 @@ public final class Parser {
         return new Ast.Statement.Declaration(name, type, value);
     }
 
-    /**
-     * Parses the {@code assignment-statement} rule. This method should only be
-     * called if the next tokens start an assignment statement, aka both an
-     * {@code identifier} followed by {@code =}.
-     */
-
     //assignment-statement ::= identifier = expression ;
     public Ast.Statement.Assignment parseAssignmentStatement() throws ParseException {
+        // type checking done in calling function
+        // identifier then '='
         String name = tokens.get(0).getLiteral();
+        tokens.advance();
         match("=");
+
         Ast.Expression ex = parseExpression();
 
         return new Ast.Statement.Assignment(name, ex);
     }
 
-    /**
-     * Parses the {@code if-statement} rule. This method should only be called
-     * if the next tokens start an if statement, aka {@code if}.
-     */
-
     //if-statement ::= IF expression THEN statement* ( ELSE statement* )? END
     public Ast.Statement.If parseIfStatement() throws ParseException {
-        match("IF");
         Ast.Expression condition = parseExpression();
         List<Ast.Statement> thenStatements = new ArrayList<>();
         List<Ast.Statement> elseStatements = new ArrayList<>();
         if (!match("THEN")) {
             throw new ParseException("No THEN", tokens.index);
         }
-        /*
-        IF true THEN
-            ...
-        END
-            ...
-        END
-         */
+
         while (!match("END")) {
             thenStatements.add(parseStatement());
             if(match("ELSE")){
                 while (!match("END")) {
                     elseStatements.add(parseStatement());
                 }
+                break;
             }
         }
         return new Ast.Statement.If(condition, thenStatements, elseStatements);
     }
 
-    /**
-     * Parses the {@code while-statement} rule. This method should only be
-     * called if the next tokens start a while statement, aka {@code while}.
-     */
-
     //while-statement ::= WHILE expression DO statement* END
     public Ast.Statement.While parseWhileStatement() throws ParseException {
-        match("WHILE");
         Ast.Expression condition = parseExpression();
         List<Ast.Statement> statements = new ArrayList<>();
 
@@ -159,32 +126,24 @@ public final class Parser {
         while (!match("END")) {
             statements.add(parseStatement());
         }
+
         return new Ast.Statement.While(condition, statements);
     }
 
-    /**
-     * Parses the {@code expression} rule.
-     */
     public Ast.Expression parseExpression() throws ParseException {
         return parseEqualityExpression();
     }
 
-    /**
-     * Parses the {@code equality-expression} rule.
-     */
     public Ast.Expression parseEqualityExpression() throws ParseException {
         Ast.Expression left = parseAdditiveExpression();
         while(match("==") || match("!=")) {
             String operator = tokens.get(-1).getLiteral();
-            Ast.Expression ex = parseAdditiveExpression();
-            left = new Ast.Expression.Binary(operator, left, ex);
+            Ast.Expression right = parseAdditiveExpression();
+            left = new Ast.Expression.Binary(operator, left, right);
         }
         return left;
     }
 
-    /**
-     * Parses the {@code additive-expression} rule.
-     */
     public Ast.Expression parseAdditiveExpression() throws ParseException {
         Ast.Expression left = parseMultiplicativeExpression();
         while(match("+") || match("-")) {
@@ -195,9 +154,6 @@ public final class Parser {
         return left;
     }
 
-    /**
-     * Parses the {@code multiplicative-expression} rule.
-     */
     public Ast.Expression parseMultiplicativeExpression() throws ParseException {
         Ast.Expression left = parsePrimaryExpression();
         while(match("*") || match("/")) {
@@ -244,7 +200,7 @@ public final class Parser {
             if (!match(")")) {
                 throw new ParseException("unclosed expression", tokens.index);
             }
-            return expression;
+            return new Ast.Expression.Group(expression);
         } else {
             throw new ParseException("invalid primary expression token", tokens.index);
         }
