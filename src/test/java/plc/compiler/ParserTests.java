@@ -215,6 +215,10 @@ final class ParserTests {
                 Arguments.of("String Literal",
                         Arrays.asList(new Token(Token.Type.STRING, "\"string\"", -1)),
                         new Ast.Expression.Literal("string")
+                ),
+                Arguments.of("String Literal",
+                        Arrays.asList(new Token(Token.Type.STRING, "\"str\\\"ing\"", -1)),
+                        new Ast.Expression.Literal("str\"ing")
                 )
         );
     }

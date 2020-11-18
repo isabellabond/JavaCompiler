@@ -181,6 +181,7 @@ public final class Parser {
         } else if (match(Token.Type.STRING)) {
             String literal = tokens.get(-1).getLiteral();
             literal = literal.substring(1,literal.length() - 1);
+            literal = literal.replaceAll("\\\\\"", "\"");
             return new Ast.Expression.Literal(literal);
         } else if (match(Token.Type.INTEGER)) {
             return new Ast.Expression.Literal(new BigInteger(tokens.get(-1).getLiteral()));
