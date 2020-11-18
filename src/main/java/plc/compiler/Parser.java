@@ -89,6 +89,10 @@ public final class Parser {
 
         Ast.Expression ex = parseExpression();
 
+        if (!match(";")) {
+            throw new ParseException("assignment statement not followed by ';'", tokens.index);
+        }
+
         return new Ast.Statement.Assignment(name, ex);
     }
 
@@ -180,11 +184,10 @@ public final class Parser {
             return new Ast.Expression.Literal(Boolean.TRUE);
         } else if (match("FALSE")) {
             return new Ast.Expression.Literal(Boolean.FALSE);
-        } else if (peek(Token.Type.DECIMAL) | peek(Token.Type.STRING) | peek(Token.Type.INTEGER)) {
-            return new Ast.Expression.Literal(tokens.get(0).getLiteral());
-        } else if (peek(Token.Type.IDENTIFIER)) {
-            String name = tokens.get(0).getLiteral();
-            tokens.advance();
+        } else if (match(Token.Type.DECIMAL) | match(Token.Type.STRING) | match(Token.Type.INTEGER)) {
+            return new Ast.Expression.Literal(tokens.get(-1).getLiteral());
+        } else if (match(Token.Type.IDENTIFIER)) {
+            String name = tokens.get(-1).getLiteral();
             if (match("(")) {
                 List<Ast.Expression> expressions = new ArrayList<Ast.Expression>();
                 while (!match(")")) {
@@ -207,16 +210,6 @@ public final class Parser {
 
     }
 
-    /**
-     * As in the lexer, returns {@code true} if the current sequence of tokens
-     * matches the given patterns. Unlike the lexer, the pattern is not a regex;
-     * instead it is either a {@link Token.Type}, which matches if the token's
-     * type is the same, or a {@link String}, which matches if the token's
-     * literal is the same.
-     *
-     * In other words, {@code Token(IDENTIFIER, "literal")} is matched by both
-     * {@code peek(Token.Type.IDENTIFIER)} and {@code peek("literal")}.
-     */
     private boolean peek(Object... patterns) {
         for (int i = 0; i < patterns.length; i++) {
             if (!tokens.has(i)) {
