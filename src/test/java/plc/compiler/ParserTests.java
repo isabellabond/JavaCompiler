@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 /**
  * You know the drill...
  */
-final class ParserTests {
+final class ParserTestsCopy {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource
@@ -368,6 +368,13 @@ final class ParserTests {
          * WHILE first != 10 DO
          *   PRINT(first);
          *   first = first + 1;
+         *   IF first == 1 THEN
+         *       PRINT(first);
+         *       first = first + 1;
+         *   ELSE
+         *       PRINT(first);
+         *       first = first + 1;
+         *   END
          * END
          */
         List<Token> input = Arrays.asList(
@@ -398,6 +405,44 @@ final class ParserTests {
                 new Token(Token.Type.INTEGER, "1", -1),
                 new Token(Token.Type.OPERATOR, ";", -1),
 
+                new Token(Token.Type.IDENTIFIER, "IF", -1),
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, "==", -1),
+                new Token(Token.Type.INTEGER, "1", -1),
+                new Token(Token.Type.IDENTIFIER, "THEN", -1),
+
+
+                new Token(Token.Type.IDENTIFIER, "PRINT", -1),
+                new Token(Token.Type.OPERATOR, "(", -1),
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, ")", -1),
+                new Token(Token.Type.OPERATOR, ";", -1),
+
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, "=", -1),
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, "+", -1),
+                new Token(Token.Type.INTEGER, "1", -1),
+                new Token(Token.Type.OPERATOR, ";", -1),
+
+
+                new Token(Token.Type.IDENTIFIER, "ELSE", -1),
+
+                new Token(Token.Type.IDENTIFIER, "PRINT", -1),
+                new Token(Token.Type.OPERATOR, "(", -1),
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, ")", -1),
+                new Token(Token.Type.OPERATOR, ";", -1),
+
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, "=", -1),
+                new Token(Token.Type.IDENTIFIER, "first", -1),
+                new Token(Token.Type.OPERATOR, "+", -1),
+                new Token(Token.Type.INTEGER, "1", -1),
+                new Token(Token.Type.OPERATOR, ";", -1),
+
+                new Token(Token.Type.IDENTIFIER, "END", -1),
+
                 new Token(Token.Type.IDENTIFIER, "END", -1)
         );
         Ast.Source expected = new Ast.Source(Arrays.asList(
@@ -419,7 +464,40 @@ final class ParserTests {
                                                 new Ast.Expression.Variable("first"),
                                                 new Ast.Expression.Literal(BigInteger.valueOf(1))
                                         )
+                                ),
+                                new Ast.Statement.If(
+                                        new Ast.Expression.Binary("==",
+                                                new Ast.Expression.Variable("first"),
+                                                new Ast.Expression.Literal(BigInteger.valueOf(1))
+                                        ),
+                                        Arrays.asList(
+                                                new Ast.Statement.Expression(
+                                                        new Ast.Expression.Function("PRINT", Arrays.asList(
+                                                                new Ast.Expression.Variable("first"))
+                                                        )
+                                                ),
+                                                new Ast.Statement.Assignment("first",
+                                                        new Ast.Expression.Binary("+",
+                                                                new Ast.Expression.Variable("first"),
+                                                                new Ast.Expression.Literal(BigInteger.valueOf(1))
+                                                        )
+                                                )
+                                        ),
+                                        Arrays.asList(
+                                                new Ast.Statement.Expression(
+                                                        new Ast.Expression.Function("PRINT", Arrays.asList(
+                                                                new Ast.Expression.Variable("first"))
+                                                        )
+                                                ),
+                                                new Ast.Statement.Assignment("first",
+                                                        new Ast.Expression.Binary("+",
+                                                                new Ast.Expression.Variable("first"),
+                                                                new Ast.Expression.Literal(BigInteger.valueOf(1))
+                                                        )
+                                                )
+                                        )
                                 )
+
                         )
                 )
         ));
