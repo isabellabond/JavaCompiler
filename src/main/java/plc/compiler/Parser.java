@@ -253,13 +253,18 @@ public final class Parser {
             if (match("(")) {
                 List<Ast.Expression> expressions = new ArrayList<Ast.Expression>();
                 while (!match(")")) {
+                    match(",");
                     expressions.add(parseExpression());
                 }
                 return new Ast.Expression.Function(name, expressions);
             }
             return new Ast.Expression.Variable(name);
-        } else if (peek("(")) {
-            return parseExpression();
+        } else if (match("(")) {
+            Ast.Expression expression = parseExpression();
+            if (!match(")")) {
+                throw new ParseException("unclosed expression", tokens.index);
+            }
+            return expression;
         } else {
             throw new ParseException("invalid primary expression token", tokens.index);
         }
