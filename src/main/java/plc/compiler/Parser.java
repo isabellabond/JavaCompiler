@@ -2,19 +2,6 @@ package plc.compiler;
 
 import java.util.*;
 
-/**
- * The parser takes the sequence of tokens emitted by the lexer and turns that
- * into a structured representation of the program, called the Abstract Syntax
- * Tree (AST).
- *
- * The parser has a similar architecture to the lexer, just with {@link Token}s
- * instead of characters. As before, {@link #peek(Object...)} and {@link
- * #match(Object...)} are helpers to make the implementation easier.
- *
- * This type of parser is called <em>recursive descent</em>. Each rule in our
- * grammar will have it's own function, and reference to other rules correspond
- * to calling that functions.
- */
 public final class Parser {
 
     private final TokenStream tokens;
@@ -23,16 +10,9 @@ public final class Parser {
         this.tokens = new TokenStream(tokens);
     }
 
-    /**
-     * Parses the tokens and returns the parsed AST.
-     */
     public static Ast parse(List<Token> tokens) throws ParseException {
         return new Parser(tokens).parseSource();
     }
-
-    /**
-     * Parses the {@code source} rule.
-     */
 
     public Ast.Source parseSource() throws ParseException {
         List<Ast.Statement> statements = new ArrayList<Ast.Statement>();
@@ -42,14 +22,8 @@ public final class Parser {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Parses the {@code statement} rule and delegates to the necessary method.
-     * If the next tokens do not start a declaration, assignment, if, or while
-     * statement, then it is an expression statement. See these methods for
-     * clarification on what starts each type of statement.
-     */
     public Ast.Statement parseStatement() throws ParseException {
-        if(match("LET")) {
+        if (match("LET")) {
             // declaration-statement
             return parseDeclarationStatement();
         }
@@ -94,24 +68,30 @@ public final class Parser {
 
     // declaration-statement ::= LET identifier : identifier ( = expression)? ;
     public Ast.Statement.Declaration parseDeclarationStatement() throws ParseException {
-        match("LET");
-
-        //not sure
+        if (!peek(Token.Type.IDENTIFIER)) {
+            throw new ParseException("'LET ' not followed by identifier", tokens.index);
+        }
         String name = tokens.get(0).getLiteral();
-
-        match(":");
-
+        tokens.advance();
+        if (!match(":")) {
+            throw new ParseException("'LET identifier ' not followed by ':'", tokens.index);
+        }
+        if (!peek(Token.Type.IDENTIFIER)) {
+            throw new ParseException("'LET identifier : ' not followed by identifier", tokens.index);
+        }
         String type = tokens.get(0).getLiteral();
+        tokens.advance();
 
         Optional<Ast.Expression> value = null;
-
-        if(match("=")){
+        if (match("=")) {
             value = Optional.of(parseExpression());
         }
-        match(";");
+
+        if (!match(";")) {
+            throw new ParseException("LET statement not followed by ';'", tokens.index);
+        }
 
         return new Ast.Statement.Declaration(name, type, value);
-
     }
 
     /**
