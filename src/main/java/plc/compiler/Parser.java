@@ -179,7 +179,9 @@ public final class Parser {
         } else if (match(Token.Type.DECIMAL)) {
             return new Ast.Expression.Literal(new BigDecimal(tokens.get(-1).getLiteral()));
         } else if (match(Token.Type.STRING)) {
-            return new Ast.Expression.Literal(tokens.get(-1).getLiteral());
+            String literal = tokens.get(-1).getLiteral();
+            literal = literal.substring(1,literal.length() - 1);
+            return new Ast.Expression.Literal(literal);
         } else if (match(Token.Type.INTEGER)) {
             return new Ast.Expression.Literal(new BigInteger(tokens.get(-1).getLiteral()));
         } else if (match(Token.Type.IDENTIFIER)) {

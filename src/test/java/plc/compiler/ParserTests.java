@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 /**
  * You know the drill...
  */
-final class ParserTestsCopy {
+final class ParserTests {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource
