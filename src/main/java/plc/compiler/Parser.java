@@ -27,7 +27,7 @@ public final class Parser {
             return parseDeclarationStatement();
         }
         else if (peek(Token.Type.IDENTIFIER,"=")) {
-            parseAssignmentStatement();
+            return parseAssignmentStatement();
         }
         else if (match("IF")) {
             return parseIfStatement();
@@ -35,7 +35,9 @@ public final class Parser {
         else if (match("WHILE")) {
             return parseWhileStatement();
         }
-        return parseExpressionStatement();
+        else {
+            return parseExpressionStatement();
+        }
     }
 
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
