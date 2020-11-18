@@ -1,8 +1,6 @@
 package plc.compiler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * The parser takes the sequence of tokens emitted by the lexer and turns that
@@ -245,14 +243,25 @@ public final class Parser {
         //these are definitely right!
         if (match("TRUE")) {
             return new Ast.Expression.Literal(Boolean.TRUE);
-        }
-        if (match("FALSE")) {
+        } else if (match("FALSE")) {
             return new Ast.Expression.Literal(Boolean.FALSE);
-        }
-
-        //not sure about this one
-        if(peek(Token.Type.DECIMAL) | peek(Token.Type.STRING) | peek(Token.Type.INTEGER)){
+        } else if (peek(Token.Type.DECIMAL) | peek(Token.Type.STRING) | peek(Token.Type.INTEGER)) {
             return new Ast.Expression.Literal(tokens.get(0).getLiteral());
+        } else if (peek(Token.Type.IDENTIFIER)) {
+            String name = tokens.get(0).getLiteral();
+            tokens.advance();
+            if (match("(")) {
+                List<Ast.Expression> expressions = new ArrayList<Ast.Expression>();
+                while (!match(")")) {
+                    expressions.add(parseExpression());
+                }
+                return new Ast.Expression.Function(name, expressions);
+            }
+            return new Ast.Expression.Variable(name);
+        } else if (peek("(")) {
+            return parseExpression();
+        } else {
+            throw new ParseException("invalid primary expression token", tokens.index);
         }
 
 
