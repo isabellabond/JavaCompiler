@@ -19,26 +19,23 @@ public final class Parser {
         while(tokens.has(0)){
             statements.add(parseStatement());
         }
-        throw new UnsupportedOperationException();
+        return new Ast.Source(statements);
     }
 
     public Ast.Statement parseStatement() throws ParseException {
         if (match("LET")) {
             return parseDeclarationStatement();
         }
-        else if(peek(Token.Type.IDENTIFIER,"=")){
+        else if (peek(Token.Type.IDENTIFIER,"=")) {
             parseAssignmentStatement();
         }
-        else if(match("IF")){
+        else if (match("IF")) {
             return parseIfStatement();
         }
-        else if(match("WHILE")){
+        else if (match("WHILE")) {
             return parseWhileStatement();
         }
-        else{
-            return parseExpressionStatement();
-        }
-        throw new UnsupportedOperationException();
+        return parseExpressionStatement();
     }
 
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
@@ -68,7 +65,7 @@ public final class Parser {
         String type = tokens.get(0).getLiteral();
         tokens.advance();
 
-        Optional<Ast.Expression> value = null;
+        Optional<Ast.Expression> value = Optional.empty();
         if (match("=")) {
             value = Optional.of(parseExpression());
         }
