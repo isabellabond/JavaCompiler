@@ -1,5 +1,7 @@
 package plc.compiler;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 public final class Parser {
@@ -41,14 +43,11 @@ public final class Parser {
     }
 
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
-        Ast.Expression value = new Ast.Expression();
-        if(value.equals(null)){
-            throw new ParseException("Empty", tokens.index);
+        Ast.Expression expression = parseEqualityExpression();
+        if (!match(";")) {
+            throw new ParseException("expression statement not followed by ';'", tokens.index);
         }
-        while (!match(";")) {
-            value = parseEqualityExpression();
-        }
-        return new Ast.Statement.Expression(value);
+        return new Ast.Statement.Expression(expression);
     }
 
     // declaration-statement ::= LET identifier : identifier ( = expression)? ;
@@ -167,13 +166,6 @@ public final class Parser {
         return left;
     }
 
-    /**
-     * Parses the {@code primary-expression} rule. This is the top-level rule
-     * for expressions and includes literal values, grouping, variables, and
-     * functions. It may be helpful to break these up into other methods but is
-     * not strictly necessary.
-     */
-
     // identifier ( ( (expression ( , expression )* )? ) )? |
     //    ( expression )
     //checking for token type
@@ -184,8 +176,12 @@ public final class Parser {
             return new Ast.Expression.Literal(Boolean.TRUE);
         } else if (match("FALSE")) {
             return new Ast.Expression.Literal(Boolean.FALSE);
-        } else if (match(Token.Type.DECIMAL) | match(Token.Type.STRING) | match(Token.Type.INTEGER)) {
+        } else if (match(Token.Type.DECIMAL)) {
+            return new Ast.Expression.Literal(new BigDecimal(tokens.get(-1).getLiteral()));
+        } else if (match(Token.Type.STRING)) {
             return new Ast.Expression.Literal(tokens.get(-1).getLiteral());
+        } else if (match(Token.Type.INTEGER)) {
+            return new Ast.Expression.Literal(new BigInteger(tokens.get(-1).getLiteral()));
         } else if (match(Token.Type.IDENTIFIER)) {
             String name = tokens.get(-1).getLiteral();
             if (match("(")) {
