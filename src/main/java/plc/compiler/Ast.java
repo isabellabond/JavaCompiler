@@ -35,7 +35,7 @@ public class Ast {
 
     }
 
-    public static class Statement extends Ast {
+    public static abstract class Statement extends Ast {
 
         public static final class Expression extends Statement {
 
@@ -45,7 +45,7 @@ public class Ast {
                 this.expression = expression;
             }
 
-            public Ast.Expression getExpr() {
+            public Ast.Expression getExpression() {
                 return expression;
             }
 
@@ -221,7 +221,7 @@ public class Ast {
 
     }
 
-    public static class Expression extends Ast {
+    public static abstract class Expression extends Ast {
 
         public static final class Literal extends Expression {
 
@@ -257,7 +257,7 @@ public class Ast {
                 this.expression = expression;
             }
 
-            public Expression getExpr() {
+            public Expression getExpression() {
                 return expression;
             }
 
@@ -378,6 +378,60 @@ public class Ast {
             }
 
         }
+
+    }
+
+    public interface Visitor<T> {
+
+        default T visit(Ast ast) {
+            if (ast instanceof Source) {
+                return visit((Source) ast);
+            } else if (ast instanceof Statement.Expression) {
+                return visit((Statement.Expression) ast);
+            } else if (ast instanceof Statement.Declaration) {
+                return visit((Statement.Declaration) ast);
+            } else if (ast instanceof Statement.Assignment) {
+                return visit((Statement.Assignment) ast);
+            } else if (ast instanceof Statement.If) {
+                return visit((Statement.If) ast);
+            } else if (ast instanceof Statement.While) {
+                return visit((Statement.While) ast);
+            } else if (ast instanceof Expression.Literal) {
+                return visit((Expression.Literal) ast);
+            } else if (ast instanceof Expression.Group) {
+                return visit((Expression.Group) ast);
+            } else if (ast instanceof Expression.Binary) {
+                return visit((Expression.Binary) ast);
+            } else if (ast instanceof Expression.Variable) {
+                return visit((Expression.Variable) ast);
+            } else if (ast instanceof Expression.Function) {
+                return visit((Expression.Function) ast);
+            } else {
+                throw new AssertionError(ast.getClass());
+            }
+        }
+
+        T visit(Source ast);
+
+        T visit(Statement.Expression ast);
+
+        T visit(Statement.Declaration ast);
+
+        T visit(Statement.Assignment ast);
+
+        T visit(Statement.If ast);
+
+        T visit(Statement.While ast);
+
+        T visit(Expression.Literal ast);
+
+        T visit(Expression.Group ast);
+
+        T visit(Expression.Binary ast);
+
+        T visit(Expression.Variable ast);
+
+        T visit(Expression.Function ast);
 
     }
 
