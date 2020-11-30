@@ -1,6 +1,8 @@
 package plc.compiler;
 
+import javax.print.DocFlavor;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 public final class Generator implements Ast.Visitor<Void> {
 
@@ -33,42 +35,33 @@ public final class Generator implements Ast.Visitor<Void> {
 
         // Source node
         print("public final class Main {");
-        newline(0);
+        newline(indent);
         indent++;
         newline(indent);
         print("public static void main(String[] args) {");
         indent++;
-        newline(indent);
 
-        if(ast.getStatements().size() == 1){
-            visit(ast.getStatements().get(0));
-        }
-        else{
-            int count = 0;
-            while(count < ast.getStatements().size()){
-                visit(ast.getStatements().get(count));
-                if(count != ast.getStatements().size()-1){
-                    newline(indent);
-                }
-                //newline(indent);
-                count++;
-            }
+        for (Ast.Statement statement : ast.getStatements()) {
+            newline(indent);
+            visit(statement);
         }
 
         indent--;
         newline(indent);
         print("}");
-        newline(0);
-        newline(0);
+        indent--;
+        newline(indent);
+        newline(indent);
         print("}");
+        newline(indent);
 
         return null;
     }
 
     @Override
     public Void visit(Ast.Statement.Expression ast) {
-        // TODO:  Generate Java to handle Expression node.
-
+        print(ast.getExpression());
+        print(";");
         return null;
     }
 
@@ -87,21 +80,38 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Statement.Assignment ast) {
 
-        // TODO:  Generate Java to handle Assignment node.
+        print(ast.getName());
+        print(" = ");
+        visit(((Ast.Expression.Binary) ast.getExpression()).getLeft());
+        print(" ", ((Ast.Expression.Binary) ast.getExpression()).getOperator(), " ");
+        visit(((Ast.Expression.Binary) ast.getExpression()).getRight());
+        print(";");
 
         return null;
     }
 
     @Override
     public Void visit(Ast.Statement.If ast) {
-
-        // If node
-        print("if (" + visit(ast.getCondition()) + ") {");
-        //confused on where to find teh statements
-        // I see the then and the else statments but none for IF??
+        print("if (", ast.getCondition(), ") {");
         indent++;
         newline(indent);
-
+        for (Ast.Statement statement : ast.getThenStatements()) {
+            visit(statement);
+        }
+        indent--;
+        newline(indent);
+        print("}");
+        if (ast.getElseStatements().size() > 0) {
+            print(" else {");
+            indent++;
+            newline(indent);
+            for (Ast.Statement statement : ast.getElseStatements()) {
+                visit(statement);
+            }
+            indent--;
+            newline(indent);
+            print("}");
+        }
 
         return null;
     }
@@ -109,65 +119,55 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Statement.While ast) {
 
-        // While node
-        print("while (" + visit(ast.getCondition()) + ") {");
-        indent++;
-        newline(indent);
-
-        if(ast.getStatements().size() == 1){
-            visit(ast.getStatements().get(0));
-        }
-        else{
-            int count = 0;
-            while(count < ast.getStatements().size()){
-                visit(ast.getStatements().get(count));
-                if(count != ast.getStatements().size()-1){
-                    newline(indent);
-                }
-                count++;
-            }
-        }
-        indent--;
-        newline(indent);
-        print("}");
+        // TODO:  Generate Java to handle While node.
 
         return null;
     }
 
     @Override
     public Void visit(Ast.Expression.Literal ast) {
-        // Literal node
-        print(ast.getValue().toString());
-
+        if (ast.equals("TRUE")) {
+            print("true");
+        } else if (ast.equals("FALSE")) {
+            print("false");
+        } else if (ast.getValue() instanceof String) {
+            print("\"", ast.getValue(), "\"");
+        } else {
+            print(ast.getValue());
+        }
         return null;
     }
 
     @Override
     public Void visit(Ast.Expression.Group ast) {
-
-        // TODO:  Generate Java to handle Group node.
+        print("(");
+        visit(ast.getExpression());
+        print(")");
         return null;
     }
 
     @Override
     public Void visit(Ast.Expression.Binary ast) {
-
-        // TODO:  Generate Java to handle Binary node.
+        print(ast.getLeft(), " ", ast.getOperator(), " " , ast.getRight());
         return null;
     }
 
     @Override
     public Void visit(Ast.Expression.Variable ast) {
-
-        // TODO:  Generate Java to handle Variable node.
+        print(ast.getName());
         return null;
     }
 
     @Override
     public Void visit(Ast.Expression.Function ast) {
-
-        // TODO:  Generate Java to handle Function node.
-
+        print(ast.getName(), "(");
+        for (int i = 0; i < ast.getArguments().size(); i++) {
+            visit(ast.getArguments().get(i));
+            if (i + 1 < ast.getArguments().size()) {
+                print(", ");
+            }
+        }
+        print(")");
         return null;
     }
 
