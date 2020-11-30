@@ -79,12 +79,10 @@ public final class Generator implements Ast.Visitor<Void> {
 
     @Override
     public Void visit(Ast.Statement.Assignment ast) {
-
+        // put together
         print(ast.getName());
         print(" = ");
-        visit(((Ast.Expression.Binary) ast.getExpression()).getLeft());
-        print(" ", ((Ast.Expression.Binary) ast.getExpression()).getOperator(), " ");
-        visit(((Ast.Expression.Binary) ast.getExpression()).getRight());
+        print(ast.getExpression());
         print(";");
 
         return null;

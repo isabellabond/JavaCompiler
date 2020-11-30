@@ -43,7 +43,7 @@ public final class Parser {
     }
 
     public Ast.Statement.Expression parseExpressionStatement() throws ParseException {
-        Ast.Expression expression = parseEqualityExpression();
+        Ast.Expression expression = parseExpression();
         if (!match(";")) {
             throw new ParseException("expression statement not followed by ';'", tokens.index);
         }
