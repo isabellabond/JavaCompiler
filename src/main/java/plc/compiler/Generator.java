@@ -118,8 +118,20 @@ public final class Generator implements Ast.Visitor<Void> {
 
     @Override
     public Void visit(Ast.Statement.While ast) {
-
-        // TODO:  Generate Java to handle While node.
+        print("while (", ast.getCondition(), ") {");
+        indent++;
+        newline(indent);
+        int count = 0;
+        while(count < ast.getStatements().size()){
+            visit(ast.getStatements().get(count));
+            if(count != ast.getStatements().size()-1){
+                newline(indent);
+            }
+            count++;
+        }
+        indent--;
+        newline(indent);
+        print("}");
 
         return null;
     }
