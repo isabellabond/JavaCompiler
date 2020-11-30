@@ -95,8 +95,10 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Statement.If ast) {
 
-        // TODO:  Generate Java to handle If node.
+        // If node
         print("if (" + visit(ast.getCondition()) + ") {");
+        //confused on where to find teh statements
+        // I see the then and the else statments but none for IF??
         indent++;
         newline(indent);
 
@@ -107,7 +109,7 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Statement.While ast) {
 
-        // TODO:  Generate Java to handle While node.
+        // While node
         print("while (" + visit(ast.getCondition()) + ") {");
         indent++;
         newline(indent);
