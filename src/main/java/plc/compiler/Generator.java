@@ -46,8 +46,12 @@ public final class Generator implements Ast.Visitor<Void> {
 
     @Override
     public Void visit(Ast.Statement.Declaration ast) {
-
-        // TODO:  Generate Java to handle Declaration node.
+        // Declaration node
+        print(ast.getType(), " ", ast.getName());
+        if (ast.getValue().isPresent()) {
+            print(" = ", ast.getValue().get());
+        }
+        print(";");
 
         return null;
     }
