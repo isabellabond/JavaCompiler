@@ -46,10 +46,11 @@ public final class Generator implements Ast.Visitor<Void> {
         else{
             int count = 0;
             while(count < ast.getStatements().size()){
-                //print(ast.getStatements().get(count));
                 visit(ast.getStatements().get(count));
-                //print(";");
-                newline(indent);
+                if(count != ast.getStatements().size()-1){
+                    newline(indent);
+                }
+                //newline(indent);
                 count++;
             }
         }
@@ -107,6 +108,26 @@ public final class Generator implements Ast.Visitor<Void> {
     public Void visit(Ast.Statement.While ast) {
 
         // TODO:  Generate Java to handle While node.
+        print("while (" + visit(ast.getCondition()) + ") {");
+        indent++;
+        newline(indent);
+
+        if(ast.getStatements().size() == 1){
+            visit(ast.getStatements().get(0));
+        }
+        else{
+            int count = 0;
+            while(count < ast.getStatements().size()){
+                visit(ast.getStatements().get(count));
+                if(count != ast.getStatements().size()-1){
+                    newline(indent);
+                }
+                count++;
+            }
+        }
+        indent--;
+        newline(indent);
+        print("}");
 
         return null;
     }
