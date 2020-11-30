@@ -31,15 +31,38 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Source ast) {
 
-        // TODO:  Generate Java to handle Source node.
+        // Source node
+        print("public final class Main {");
+        newline(0);
+        indent++;
+        newline(indent);
+        print("public static void main(String[] args) {");
+        indent++;
+        newline(indent);
+
+        int count = 0;
+        while(count < ast.getStatements().size()){
+            //print(ast.getStatements().get(count));
+            visit(ast.getStatements().get(count));
+            //print(";");
+            newline(indent);
+            count++;
+        }
+
+        indent--;
+        newline(indent);
+        print("}");
+        newline(0);
+        newline(0);
+        print("}");
 
         return null;
     }
 
     @Override
     public Void visit(Ast.Statement.Expression ast) {
-
         // TODO:  Generate Java to handle Expression node.
+        //print(ast.getClass(), " ", ast.getExpression());
 
         return null;
     }
