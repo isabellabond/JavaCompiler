@@ -40,13 +40,18 @@ public final class Generator implements Ast.Visitor<Void> {
         indent++;
         newline(indent);
 
-        int count = 0;
-        while(count < ast.getStatements().size()){
-            //print(ast.getStatements().get(count));
-            visit(ast.getStatements().get(count));
-            //print(";");
-            newline(indent);
-            count++;
+        if(ast.getStatements().size() == 1){
+            visit(ast.getStatements().get(0));
+        }
+        else{
+            int count = 0;
+            while(count < ast.getStatements().size()){
+                //print(ast.getStatements().get(count));
+                visit(ast.getStatements().get(count));
+                //print(";");
+                newline(indent);
+                count++;
+            }
         }
 
         indent--;
@@ -105,8 +110,8 @@ public final class Generator implements Ast.Visitor<Void> {
 
     @Override
     public Void visit(Ast.Expression.Literal ast) {
-
-        // TODO:  Generate Java to handle Literal node.
+        // Literal node
+        print(ast.getValue().toString());
 
         return null;
     }
@@ -115,7 +120,6 @@ public final class Generator implements Ast.Visitor<Void> {
     public Void visit(Ast.Expression.Group ast) {
 
         // TODO:  Generate Java to handle Group node.
-
         return null;
     }
 
@@ -123,7 +127,6 @@ public final class Generator implements Ast.Visitor<Void> {
     public Void visit(Ast.Expression.Binary ast) {
 
         // TODO:  Generate Java to handle Binary node.
-
         return null;
     }
 
@@ -131,7 +134,6 @@ public final class Generator implements Ast.Visitor<Void> {
     public Void visit(Ast.Expression.Variable ast) {
 
         // TODO:  Generate Java to handle Variable node.
-
         return null;
     }
 
