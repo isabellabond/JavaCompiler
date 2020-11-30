@@ -67,7 +67,6 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Statement.Expression ast) {
         // TODO:  Generate Java to handle Expression node.
-        //print(ast.getClass(), " ", ast.getExpression());
 
         return null;
     }
@@ -96,6 +95,10 @@ public final class Generator implements Ast.Visitor<Void> {
     public Void visit(Ast.Statement.If ast) {
 
         // TODO:  Generate Java to handle If node.
+        print("if (" + visit(ast.getCondition()) + ") {");
+        indent++;
+        newline(indent);
+
 
         return null;
     }
