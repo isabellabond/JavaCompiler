@@ -105,7 +105,9 @@ public final class Parser {
         }
 
         while (!match("END")) {
+
             thenStatements.add(parseStatement());
+
             if(match("ELSE")){
                 while (!match("END")) {
                     elseStatements.add(parseStatement());
