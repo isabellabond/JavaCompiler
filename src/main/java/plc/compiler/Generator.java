@@ -91,13 +91,16 @@ public final class Generator implements Ast.Visitor<Void> {
     @Override
     public Void visit(Ast.Statement.If ast) {
         print("if (", ast.getCondition(), ") {");
-        indent++;
-        newline(indent);
-        for (Ast.Statement statement : ast.getThenStatements()) {
-            visit(statement);
+        if (ast.getThenStatements().size() > 0) {
+
+            indent++;
+            newline(indent);
+            for (Ast.Statement statement : ast.getThenStatements()) {
+                visit(statement);
+            }
+            indent--;
+            newline(indent);
         }
-        indent--;
-        newline(indent);
         print("}");
         if (ast.getElseStatements().size() > 0) {
             print(" else {");
