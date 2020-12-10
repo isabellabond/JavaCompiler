@@ -58,7 +58,21 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Expression.Literal visit(Ast.Expression.Literal ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        if (ast.getValue() instanceof Boolean) {
+            return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
+        }
+        else if (ast.getValue() instanceof java.math.BigInteger) {
+            return new Ast.Expression.Literal(Stdlib.Type.INTEGER, ast.getValue());
+        }
+        else if (ast.getValue() instanceof java.math.BigDecimal) {
+            return new Ast.Expression.Literal(Stdlib.Type.DECIMAL, ast.getValue());
+        }
+        else if (ast.getValue() instanceof String) {
+            return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
+        }
+        else{
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override
