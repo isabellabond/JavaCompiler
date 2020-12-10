@@ -46,6 +46,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Statement.While visit(Ast.Statement.While ast) throws AnalysisException {
+        if (ast.getC)
         throw new UnsupportedOperationException(); //TODO
     }
 
@@ -62,13 +63,13 @@ public final class Analyzer implements Ast.Visitor<Ast> {
             return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
         }
         else if (ast.getValue() instanceof java.math.BigInteger) {
-            return new Ast.Expression.Literal(Stdlib.Type.INTEGER, ast.getValue());
+
         }
         else if (ast.getValue() instanceof java.math.BigDecimal) {
-            return new Ast.Expression.Literal(Stdlib.Type.DECIMAL, ast.getValue());
+
         }
         else if (ast.getValue() instanceof String) {
-            return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
+
         }
         else{
             throw new UnsupportedOperationException();
