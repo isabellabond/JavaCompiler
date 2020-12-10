@@ -1,6 +1,7 @@
 package plc.compiler;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -223,11 +224,29 @@ public class Ast {
 
     public static abstract class Expression extends Ast {
 
+        protected final Stdlib.Type type;
+
+        private Expression(Stdlib.Type type) {
+            this.type = type;
+        }
+
+        public final Stdlib.Type getType() {
+            if (type == null) {
+                throw new IllegalStateException("This AST has no.");
+            }
+            return type;
+        }
+
         public static final class Literal extends Expression {
 
             private final Object value;
 
             public Literal(Object value) {
+                this(null, value);
+            }
+
+            public Literal(Stdlib.Type type, Object value) {
+                super(type);
                 this.value = value;
             }
 
@@ -237,13 +256,16 @@ public class Ast {
 
             @Override
             public boolean equals(Object obj) {
-                return obj instanceof Literal && value.equals(((Literal) obj).value);
+                return obj instanceof Literal &&
+                        value.equals(((Literal) obj).value) &&
+                        Objects.equals(type, ((Literal) obj).type);
             }
 
             @Override
             public String toString() {
                 return "Literal{" +
                         "value=" + value +
+                        ", type=" + type +
                         '}';
             }
 
@@ -254,6 +276,11 @@ public class Ast {
             private final Expression expression;
 
             public Group(Expression expression) {
+                this(null, expression);
+            }
+
+            public Group(Stdlib.Type type, Expression expression) {
+                super(type);
                 this.expression = expression;
             }
 
@@ -263,13 +290,16 @@ public class Ast {
 
             @Override
             public boolean equals(Object obj) {
-                return obj instanceof Group && expression.equals(((Group) obj).expression);
+                return obj instanceof Group &&
+                        expression.equals(((Group) obj).expression) &&
+                        Objects.equals(type, ((Group) obj).type);
             }
 
             @Override
             public String toString() {
                 return "Group{" +
                         "expression=" + expression +
+                        ", type=" + type +
                         '}';
             }
 
@@ -282,6 +312,11 @@ public class Ast {
             private final Expression right;
 
             public Binary(String operator, Expression left, Expression right) {
+                this(null, operator, left, right);
+            }
+
+            public Binary(Stdlib.Type type, String operator, Expression left, Expression right) {
+                super(type);
                 this.operator = operator;
                 this.left = left;
                 this.right = right;
@@ -304,7 +339,8 @@ public class Ast {
                 return obj instanceof Binary &&
                         operator.equals(((Binary) obj).operator) &&
                         left.equals(((Binary) obj).left) &&
-                        right.equals(((Binary) obj).right);
+                        right.equals(((Binary) obj).right) &&
+                        Objects.equals(type, ((Binary) obj).type);
             }
 
             @Override
@@ -313,6 +349,7 @@ public class Ast {
                         "operator='" + operator + '\'' +
                         ", left=" + left +
                         ", right=" + right +
+                        ", type=" + type +
                         '}';
             }
 
@@ -323,6 +360,11 @@ public class Ast {
             private final String name;
 
             public Variable(String name) {
+                this(null, name);
+            }
+
+            public Variable(Stdlib.Type type, String name) {
+                super(type);
                 this.name = name;
             }
 
@@ -332,13 +374,16 @@ public class Ast {
 
             @Override
             public boolean equals(Object obj) {
-                return obj instanceof Variable && name.equals(((Variable) obj).name);
+                return obj instanceof Variable &&
+                        name.equals(((Variable) obj).name) &&
+                        Objects.equals(type, ((Variable) obj).type);
             }
 
             @Override
             public String toString() {
                 return "Variable{" +
                         "name='" + name + '\'' +
+                        ", type=" + type +
                         '}';
             }
 
@@ -350,6 +395,11 @@ public class Ast {
             private final List<Expression> arguments;
 
             public Function(String name, List<Expression> arguments) {
+                this(null, name, arguments);
+            }
+
+            public Function(Stdlib.Type type, String name, List<Expression> arguments) {
+                super(type);
                 this.name = name;
                 this.arguments = arguments;
             }
@@ -366,7 +416,8 @@ public class Ast {
             public boolean equals(Object obj) {
                 return obj instanceof Function &&
                         name.equals(((Function) obj).name) &&
-                        arguments.equals(((Function) obj).arguments);
+                        arguments.equals(((Function) obj).arguments) &&
+                        Objects.equals(type, ((Function) obj).type);
             }
 
             @Override
@@ -374,6 +425,7 @@ public class Ast {
                 return "Function{" +
                         "name='" + name + '\'' +
                         ", arguments=" + arguments +
+                        ", type=" + type +
                         '}';
             }
 
