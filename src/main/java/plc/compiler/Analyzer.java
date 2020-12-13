@@ -1,9 +1,7 @@
 package plc.compiler;
 
-/**
- * See the specification for information about what the different visit
- * methods should do.
- */
+import java.math.BigInteger;
+
 public final class Analyzer implements Ast.Visitor<Ast> {
 
     public Scope scope;
@@ -14,45 +12,72 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast visit(Ast.Source ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        if (ast.getStatements().isEmpty())
+            throw new AnalysisException("Source statements empty");
+        return new Ast.Source(ast.getStatements());
     }
 
-    /**
-     * Statically validates that visiting a statement returns a statement.
-     */
     private Ast.Statement visit(Ast.Statement ast) throws AnalysisException {
         return (Ast.Statement) visit((Ast) ast);
     }
 
     @Override
     public Ast.Statement.Expression visit(Ast.Statement.Expression ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        if (ast.getExpression().getClass() != Ast.Expression.Function.class)
+            throw new AnalysisException("Expression not function");
+        return new Ast.Statement.Expression(ast.getExpression());
     }
 
     @Override
     public Ast.Statement.Declaration visit(Ast.Statement.Declaration ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        try {
+            scope.lookup(ast.getName());
+        } catch (AnalysisException e) {
+            if (Stdlib.getType(ast.getType()).equals(Stdlib.Type.VOID))
+                throw new AnalysisException("Declaration type void");
+            checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
+            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue());
+        }
+        throw new AnalysisException("declared variable already defined");
     }
 
     @Override
     public Ast.Statement.Assignment visit(Ast.Statement.Assignment ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        checkAssignable(ast.getExpression().getType(), scope.lookup(ast.getName()));
+        return new Ast.Statement.Assignment(ast.getName(), ast.getExpression());
     }
 
     @Override
     public Ast.Statement.If visit(Ast.Statement.If ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        if (!ast.getCondition().getType().equals(Stdlib.Type.BOOLEAN))
+            throw new AnalysisException("if condition not boolean");
+        if (ast.getThenStatements().isEmpty())
+            throw new AnalysisException("then statements empty");
+        scope = new Scope(scope);
+        for (Ast.Statement statement : ast.getThenStatements()) {
+            visit(statement);
+        }
+        scope = scope.getParent();
+        scope = new Scope(scope);
+        for (Ast.Statement statement : ast.getElseStatements()) {
+            visit(statement);
+        }
+        scope = scope.getParent();
+        return new Ast.Statement.If(ast.getCondition(), ast.getThenStatements(), ast.getElseStatements());
     }
 
     @Override
     public Ast.Statement.While visit(Ast.Statement.While ast) throws AnalysisException {
-        if (ast.getC)
-        throw new UnsupportedOperationException(); //TODO
+        if (!ast.getCondition().getType().equals(Stdlib.Type.BOOLEAN))
+            throw new AnalysisException("while condition not boolean");
+        scope = new Scope(scope);
+        for (Ast.Statement statement : ast.getStatements()) {
+            visit(statement);
+        }
+        scope = scope.getParent();
+        return new Ast.Statement.While(ast.getCondition(), ast.getStatements());
     }
 
-    /**
-     * Statically validates that visiting an expression returns an expression.
-     */
     private Ast.Expression visit(Ast.Expression ast) throws AnalysisException {
         return (Ast.Expression) visit((Ast) ast);
     }
@@ -61,17 +86,14 @@ public final class Analyzer implements Ast.Visitor<Ast> {
     public Ast.Expression.Literal visit(Ast.Expression.Literal ast) throws AnalysisException {
         if (ast.getValue() instanceof Boolean) {
             return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
-        }
-        else if (ast.getValue() instanceof java.math.BigInteger) {
-
-        }
-        else if (ast.getValue() instanceof java.math.BigDecimal) {
-
-        }
-        else if (ast.getValue() instanceof String) {
-
-        }
-        else{
+        } else if (ast.getValue() instanceof java.math.BigInteger) {
+            // TODO if (((BigInteger) ast.getValue()).abs() > BigInteger.MAX_VALUE)
+            return new Ast.Expression.Literal(Stdlib.Type.INTEGER, ast.getValue());
+        } else if (ast.getValue() instanceof java.math.BigDecimal) {
+            return new Ast.Expression.Literal(, ast.getValue());
+        } else if (ast.getValue() instanceof String) {
+            return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
+        } else {
             throw new UnsupportedOperationException();
         }
     }
@@ -103,7 +125,10 @@ public final class Analyzer implements Ast.Visitor<Ast> {
      *  - The first type is not VOID and the target type is ANY
      */
     public static void checkAssignable(Stdlib.Type type, Stdlib.Type target) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        if (type.equals(target)) return;
+        if (type.equals(Stdlib.Type.INTEGER) && type.equals(Stdlib.Type.INTEGER)) return;
+        if (!type.equals(Stdlib.Type.VOID) && type.equals(Stdlib.Type.ANY)) return;
+        throw new AnalysisException("Target not assignable by type");
     }
 
 }
