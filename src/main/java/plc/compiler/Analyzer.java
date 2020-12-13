@@ -1,5 +1,6 @@
 package plc.compiler;
 
+import java.util.List;
 import java.math.BigInteger;
 
 public final class Analyzer implements Ast.Visitor<Ast> {
@@ -115,7 +116,13 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Expression.Function visit(Ast.Expression.Function ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        Stdlib.Function function = Stdlib.getFunction(ast.getName(), ast.getArguments().size());
+        List<Stdlib.Type> paramTypes = function.getParameterTypes();
+        for (int i = 0 ; i < paramTypes.size(); i++) {
+            if (!paramTypes.get(i).equals(ast.getArguments().get(i)))
+                throw new AnalysisException("function args not of correct type");
+        }
+        return new Ast.Expression.Function(function.getJvmName(), ast.getArguments());
     }
 
     /**
