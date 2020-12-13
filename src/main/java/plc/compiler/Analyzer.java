@@ -89,9 +89,10 @@ public final class Analyzer implements Ast.Visitor<Ast> {
             return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
         } else if (ast.getValue() instanceof java.math.BigInteger) {
             // TODO if (((BigInteger) ast.getValue()).abs() > BigInteger.MAX_VALUE)
+            if(((BigInteger) ast.getValue()).compareTo(2147483647) > )
             return new Ast.Expression.Literal(Stdlib.Type.INTEGER, ast.getValue());
         } else if (ast.getValue() instanceof java.math.BigDecimal) {
-            return new Ast.Expression.Literal(, ast.getValue());
+            return new Ast.Expression.Literal(ast.getValue());
         } else if (ast.getValue() instanceof String) {
             return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
         } else {
