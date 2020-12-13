@@ -111,7 +111,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Expression.Variable visit(Ast.Expression.Variable ast) throws AnalysisException {
-        throw new UnsupportedOperationException(); //TODO
+        return new Ast.Expression.Variable(scope.lookup(ast.getName()), ast.getName());
     }
 
     @Override
