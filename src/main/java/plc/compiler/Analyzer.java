@@ -89,7 +89,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
         if (ast.getValue() instanceof Boolean) {
             return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
         } else if (ast.getValue() instanceof java.math.BigInteger) {
-            if(((BigInteger) ast.getValue()).intValue() > 2147483647 || ((BigInteger) ast.getValue()).intValue() < -2147483647){
+            if(((BigInteger) ast.getValue()).abs().intValue() > 2147483647){
                 throw new AnalysisException("Out of bounds");
             }
             else{
@@ -103,7 +103,13 @@ public final class Analyzer implements Ast.Visitor<Ast> {
                 return new Ast.Expression.Literal(((BigDecimal) ast.getValue()).doubleValue());
             }
         } else if (ast.getValue() instanceof String) {
-            return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
+            // Can only contain [A-Za-z0-9_!?.+-/* ]
+            if(((String) ast.getValue()).contains("$%^#&(),<>")){
+                throw new Error("Invalid characters");
+            }
+            else {
+                return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
+            }
         } else {
             throw new UnsupportedOperationException();
         }
@@ -116,6 +122,9 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Expression.Binary visit(Ast.Expression.Binary ast) throws AnalysisException {
+        //if(ast.getOperator() == "=="){
+            //return new Ast.Expression.Binary(ast.getOperator(), ast.getLeft(), ast.getRight());
+        //}
         throw new UnsupportedOperationException(); //TODO
     }
 
