@@ -1,5 +1,6 @@
 package plc.compiler;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.math.BigInteger;
 
@@ -88,15 +89,19 @@ public final class Analyzer implements Ast.Visitor<Ast> {
         if (ast.getValue() instanceof Boolean) {
             return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
         } else if (ast.getValue() instanceof java.math.BigInteger) {
-            // TODO if (((BigInteger) ast.getValue()).abs() > BigInteger.MAX_VALUE)
             if(((BigInteger) ast.getValue()).intValue() > 2147483647 || ((BigInteger) ast.getValue()).intValue() < -2147483647){
                 throw new AnalysisException("Out of bounds");
             }
             else{
-                return new Ast.Expression.Literal(Stdlib.Type.INTEGER, ast.getValue());
+                return new Ast.Expression.Literal(Stdlib.Type.INTEGER, ((BigInteger) ast.getValue()).intValue());
             }
         } else if (ast.getValue() instanceof java.math.BigDecimal) {
-            return new Ast.Expression.Literal(ast.getValue());
+            if( ((BigDecimal) ast.getValue()).abs().doubleValue() > Math.pow(10,31)-1) {
+                throw new AnalysisException("Out of bounds");
+            }
+            else{
+                return new Ast.Expression.Literal(((BigDecimal) ast.getValue()).doubleValue());
+            }
         } else if (ast.getValue() instanceof String) {
             return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
         } else {
