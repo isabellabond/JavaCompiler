@@ -32,15 +32,28 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Statement.Declaration visit(Ast.Statement.Declaration ast) throws AnalysisException {
-        try {
-            scope.lookup(ast.getName());
-        } catch (AnalysisException e) {
-            if (Stdlib.getType(ast.getType()).equals(Stdlib.Type.VOID))
-                throw new AnalysisException("Declaration type void");
-            checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
-            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue());
+
+        scope.define(ast.getName(), Stdlib.getType(ast.getType()));
+
+        if (Stdlib.getType(ast.getType()).equals(Stdlib.Type.VOID)){
+            throw new AnalysisException("Declaration type void");
         }
-        throw new AnalysisException("declared variable already defined");
+
+            //checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
+            // Stdlib.getType(ast.getType()).getJvmName()
+            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue());
+
+
+//        try {
+//            scope.lookup(ast.getName());
+//        }
+//        catch (AnalysisException e) {
+//            if (Stdlib.getType(ast.getType()).equals(Stdlib.Type.VOID))
+//                throw new AnalysisException("Declaration type void");
+//            checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
+//            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue());
+//        }
+//        throw new AnalysisException("declared variable already defined");
     }
 
     @Override
@@ -51,7 +64,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Statement.If visit(Ast.Statement.If ast) throws AnalysisException {
-        if (!ast.getCondition().getType().equals(Stdlib.Type.BOOLEAN))
+        if(!ast.getCondition().equals(Stdlib.Type.BOOLEAN))
             throw new AnalysisException("if condition not boolean");
         if (ast.getThenStatements().isEmpty())
             throw new AnalysisException("then statements empty");
@@ -70,7 +83,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Statement.While visit(Ast.Statement.While ast) throws AnalysisException {
-        if (!ast.getCondition().getType().equals(Stdlib.Type.BOOLEAN))
+        if (!ast.getCondition().equals(Stdlib.Type.BOOLEAN))
             throw new AnalysisException("while condition not boolean");
         scope = new Scope(scope);
         for (Ast.Statement statement : ast.getStatements()) {
@@ -89,7 +102,9 @@ public final class Analyzer implements Ast.Visitor<Ast> {
         if (ast.getValue() instanceof Boolean) {
             return new Ast.Expression.Literal(Stdlib.Type.BOOLEAN, ast.getValue());
         } else if (ast.getValue() instanceof java.math.BigInteger) {
-            if(((BigInteger) ast.getValue()).abs().intValue() > 2147483647){
+            BigInteger val = ((BigInteger) ast.getValue()).abs();
+            BigInteger intMax = new BigInteger("2147483647");
+            if(val.compareTo(intMax) > 0){
                 throw new AnalysisException("Out of bounds");
             }
             else{
@@ -105,7 +120,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
         } else if (ast.getValue() instanceof String) {
             // Can only contain [A-Za-z0-9_!?.+-/* ]
             if(((String) ast.getValue()).contains("$%^#&(),<>")){
-                throw new Error("Invalid characters");
+                throw new AnalysisException("Invalid characters");
             }
             else {
                 return new Ast.Expression.Literal(Stdlib.Type.STRING, ast.getValue());
@@ -122,10 +137,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
     @Override
     public Ast.Expression.Binary visit(Ast.Expression.Binary ast) throws AnalysisException {
-        //if(ast.getOperator() == "=="){
-            //return new Ast.Expression.Binary(ast.getOperator(), ast.getLeft(), ast.getRight());
-        //}
-        throw new UnsupportedOperationException(); //TODO
+            return new Ast.Expression.Binary(ast.getOperator(), ast.getLeft(), ast.getRight());
     }
 
     @Override
@@ -138,7 +150,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
         Stdlib.Function function = Stdlib.getFunction(ast.getName(), ast.getArguments().size());
         List<Stdlib.Type> paramTypes = function.getParameterTypes();
         for (int i = 0 ; i < paramTypes.size(); i++) {
-            if (!paramTypes.get(i).equals(ast.getArguments().get(i)))
+            if (paramTypes.get(i).equals(ast.getArguments().get(i)))
                 throw new AnalysisException("function args not of correct type");
         }
         return new Ast.Expression.Function(function.getJvmName(), ast.getArguments());
