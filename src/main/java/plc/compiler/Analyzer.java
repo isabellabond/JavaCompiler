@@ -3,6 +3,7 @@ package plc.compiler;
 import java.math.BigDecimal;
 import java.util.List;
 import java.math.BigInteger;
+import java.util.Optional;
 
 public final class Analyzer implements Ast.Visitor<Ast> {
 
@@ -41,7 +42,8 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
             //checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
             // Stdlib.getType(ast.getType()).getJvmName()
-            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue());
+            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(),
+                    ast.getValue().equals(Optional.empty()) ? Optional.empty() : Optional.of(visit(ast.getValue().get())));
 
 
 //        try {
