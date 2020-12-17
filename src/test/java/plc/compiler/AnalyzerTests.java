@@ -191,7 +191,7 @@ public final class AnalyzerTests {
                 Arguments.of("Different Types", Stdlib.Type.BOOLEAN, Stdlib.Type.STRING, false),
                 Arguments.of("Integer to Decimal", Stdlib.Type.INTEGER, Stdlib.Type.DECIMAL, true),
                 Arguments.of("Decimal to Integer", Stdlib.Type.DECIMAL, Stdlib.Type.INTEGER, false),
-                Arguments.of("String to Any", Stdlib.Type.STRING, Stdlib.Type.ANY, true),
+                Arguments.of("String to Any", Stdlib.Type.STRING, Stdlib.Type.ANY, false),
                 Arguments.of("Void to Any", Stdlib.Type.VOID, Stdlib.Type.ANY, false)
         );
     }

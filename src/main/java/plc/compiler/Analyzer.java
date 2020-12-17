@@ -42,20 +42,7 @@ public final class Analyzer implements Ast.Visitor<Ast> {
 
             //checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
             // Stdlib.getType(ast.getType()).getJvmName()
-            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(),
-                    ast.getValue().equals(Optional.empty()) ? Optional.empty() : Optional.of(visit(ast.getValue().get())));
-
-
-//        try {
-//            scope.lookup(ast.getName());
-//        }
-//        catch (AnalysisException e) {
-//            if (Stdlib.getType(ast.getType()).equals(Stdlib.Type.VOID))
-//                throw new AnalysisException("Declaration type void");
-//            checkAssignable(ast.getValue().get().getType(), Stdlib.getType(ast.getType()));
-//            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue());
-//        }
-//        throw new AnalysisException("declared variable already defined");
+            return new Ast.Statement.Declaration(ast.getName(), Stdlib.getType(ast.getType()).getJvmName(), ast.getValue().equals(Optional.empty()) ? Optional.empty() : Optional.of(visit(ast.getValue().get())));
     }
 
     @Override
@@ -167,7 +154,9 @@ public final class Analyzer implements Ast.Visitor<Ast> {
     public static void checkAssignable(Stdlib.Type type, Stdlib.Type target) throws AnalysisException {
         if (type.equals(target)) return;
         if (type.equals(Stdlib.Type.INTEGER) && type.equals(Stdlib.Type.INTEGER)) return;
-        if (!type.equals(Stdlib.Type.VOID) && type.equals(Stdlib.Type.ANY)) return;
+        if (!type.equals(Stdlib.Type.VOID) && type.equals(Stdlib.Type.ANY)){
+            return;
+        }
         throw new AnalysisException("Target not assignable by type");
     }
 
